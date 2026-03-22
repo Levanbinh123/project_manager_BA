@@ -26,7 +26,7 @@ public class ProjectService : IProjectService
 
         var chat = new Chat
         {
-           // Name = $"Chat for project: {projectDto.Name}",
+            name = $"Chat for project: {projectDto.Name}",
             Project = project,
             Users = new List<User> { user }
         };
@@ -67,7 +67,7 @@ public class ProjectService : IProjectService
     }
 
     // Lấy project theo Id
-    public async Task<ProjectDTO> GetProjectById(int id)
+    public async Task<ProjectDTO> GetProjectById(long id)
     {
         var project = await _context.Projects
             .Include(p => p.Team)
@@ -92,7 +92,7 @@ public class ProjectService : IProjectService
     }
 
     //  Xóa project
-    public async Task DeleteProject(int projectId, int userId)
+    public async Task DeleteProject(long projectId, long userId)
     {
         var project = await _context.Projects.FindAsync(projectId);
         if (project == null)
@@ -103,7 +103,7 @@ public class ProjectService : IProjectService
     }
 
     //Cập nhật project
-    public async Task<Project> UpdateProject(int id, UpdateProject projectDto)
+    public async Task<Project> UpdateProject(long id, UpdateProject projectDto)
     {
         var project = await _context.Projects.FindAsync(id);
         if (project == null)
@@ -118,7 +118,7 @@ public class ProjectService : IProjectService
     }
 
     //Thêm user vào project
-    public async Task AddUserToProject(int projectId, int userId)
+    public async Task AddUserToProject(long projectId, long userId)
     {
         var project = await _context.Projects
             .Include(p => p.Team)
@@ -138,7 +138,7 @@ public class ProjectService : IProjectService
     }
 
     //  Xóa user khỏi project
-    public async Task RemoveUserFromProject(int projectId, int userId)
+    public async Task RemoveUserFromProject(long projectId, long userId)
     {
         var project = await _context.Projects
             .Include(p => p.Team)
@@ -159,7 +159,7 @@ public class ProjectService : IProjectService
     }
 
     // Lấy chat theo projectId
-    public async Task<Chat> GetChatByProjectId(int projectId)
+    public async Task<Chat> GetChatByProjectId(long projectId)
     {
         var project = await _context.Projects
             .Include(p => p.Chat)

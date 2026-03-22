@@ -27,7 +27,7 @@ public class UserService : IUserService
     }
 
     // Tìm user theo Id
-    public async Task<User> FindUserById(int userId)
+    public async Task<User> FindUserById(long userId)
     {
         return await _context.Users.FindAsync(userId);
     }
@@ -42,7 +42,7 @@ public class UserService : IUserService
     }
 
     // Xóa user và xử lý liên kết
-    public async Task DeleteUser(int userId)
+    public async Task DeleteUser(long userId)
     {
         var user = await _context.Users
             .Include(u => u.AssignedIssues)
@@ -105,7 +105,7 @@ public class UserService : IUserService
     }
 
     // Cập nhật user
-    public async Task<User> UpdateUser(int userId, User userUpdate)
+    public async Task<User> UpdateUser(long userId, User userUpdate)
     {
         var user = await _context.Users.FindAsync(userId);
         if (user == null) throw new Exception("User not found");

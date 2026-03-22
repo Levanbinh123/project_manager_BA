@@ -14,7 +14,7 @@ public class InvitationService : IInvitationService
     }
 
     // Gửi invitation
-    public async Task SendInvitation(string email, int projectId)
+    public async Task SendInvitation(string email, long projectId)
     {
         // Tạo token
         string token = Guid.NewGuid().ToString();
@@ -36,7 +36,7 @@ public class InvitationService : IInvitationService
     }
 
     // Accept invitation
-    public async Task<string> AcceptInvitation(string token, int userId)
+    public async Task<Invitation> AcceptInvitation(string token, long userId)
     {
         var invitation = await _context.Invitations
             .FirstOrDefaultAsync(i => i.Token == token);
@@ -68,7 +68,7 @@ public class InvitationService : IInvitationService
         _context.Invitations.Remove(invitation);
         await _context.SaveChangesAsync();
 
-        return "Joined project successfully!";
+        return invitation;
     }
 
     // Lấy token theo email

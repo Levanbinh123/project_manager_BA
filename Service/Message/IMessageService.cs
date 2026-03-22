@@ -1,5 +1,5 @@
 public interface IMessageService
 {
-    Task<Message> SaveMessage(int senderId, int projectId, string content);
-    Task<List<Message>> GetMessagesByProjectId(int projectId);
+    Task<Message> SaveMessage(long senderId, long projectId, string content);
+    Task<List<Message>> GetMessagesByProjectId(long projectId);
 }

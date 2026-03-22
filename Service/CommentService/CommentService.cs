@@ -50,7 +50,7 @@ public class CommentService : ICommentService
         await _commentRepository.DeleteAsync(commentId);
     }
 
-    // 🔥 GET COMMENTS BY ISSUE
+    //  GET COMMENTS BY ISSUE
     public async Task<List<Comment>> FindCommentsByIssueIdAsync(long issueId)
     {
         return await _commentRepository.FindByIssueIdAsync(issueId);

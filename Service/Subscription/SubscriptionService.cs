@@ -29,7 +29,7 @@ public class SubscriptionService : ISubscriptionService
     }
 
     // Lấy subscription của user và đảm bảo valid
-    public async Task<Subscription> GetUserSubscription(int userId)
+    public async Task<Subscription> GetUserSubscription(long userId)
     {
         var subscription = await _context.Subscriptions
             .FirstOrDefaultAsync(s => s.UserId == userId);
@@ -47,7 +47,7 @@ public class SubscriptionService : ISubscriptionService
     }
 
     //  Nâng cấp subscription
-    public async Task<Subscription> UpgradeSubscription(int userId, PlanType planType)
+    public async Task<Subscription> UpgradeSubscription(long userId, PlanType planType)
     {
         var subscription = await _context.Subscriptions
             .FirstOrDefaultAsync(s => s.UserId == userId);

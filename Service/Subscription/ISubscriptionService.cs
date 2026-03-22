@@ -1,7 +1,7 @@
 public interface ISubscriptionService
 {
     Task<Subscription> CreateSubscription(User user);
-    Task<Subscription> GetUserSubscription(int userId);
-    Task<Subscription> UpgradeSubscription(int userId, PlanType planType);
+    Task<Subscription> GetUserSubscription(long userId);
+    Task<Subscription> UpgradeSubscription(long userId, PlanType planType);
     bool IsValid(Subscription subscription);
 }
