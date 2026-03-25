@@ -3,20 +3,21 @@ using Microsoft.EntityFrameworkCore;
 public class UserService : IUserService
 {
     private readonly AppDbContext _context;
-    //private readonly IJwtProvider _jwtProvider; // bạn cần inject JwtProvider
+   private readonly JwtService _jwtProvider; 
 
-    public UserService(AppDbContext context)
+    public UserService(AppDbContext context,JwtService jwtService)
     {
         _context = context;
+        _jwtProvider=jwtService;
       
     }
 
-    // Lấy user từ JWT
-    // public async Task<User> FindUserProfileByJwt(string jwt)
-    // {
-    //     var email = _jwtProvider.GetEmailFromToken(jwt);
-    //     return await FindUserByEmail(email);
-    // }
+
+    public async Task<User> FindUserProfileByJwt(string jwt)
+     {
+         var email = _jwtProvider.GetEmailFromToken(jwt);
+       return await FindUserByEmail(email);
+    }
 
     // Tìm user theo email
     public async Task<User> FindUserByEmail(string email)

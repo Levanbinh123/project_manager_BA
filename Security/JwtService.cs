@@ -33,8 +33,12 @@ public class JwtService
     }
 
     public string GetEmailFromToken(string token)
-    {
+    {   
+          if (token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        token = token.Substring("Bearer ".Length).Trim();
         var handler = new JwtSecurityTokenHandler();
+        if(!handler.CanReadToken(token))
+        throw new SecurityTokenMalformedException("Jwt khong dung dinh dang");
         var jwt = handler.ReadJwtToken(token);
 
         return jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;

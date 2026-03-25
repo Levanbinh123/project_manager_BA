@@ -10,7 +10,7 @@ public class IssueService : IIssueService
     }
 
     //  Get Issue by Id
-    public async Task<Issue> GetIssueById(int issueId)
+    public async Task<Issue> GetIssueById(long issueId)
     {
         var issue = await _context.Issues
             .Include(i => i.Project)
@@ -24,9 +24,10 @@ public class IssueService : IIssueService
     }
 
     // Get Issues by Project
-    public async Task<List<Issue>> GetIssuesByProjectId(int projectId)
+    public async Task<List<Issue>> GetIssuesByProjectId(long projectId)
     {
         return await _context.Issues
+        .Include(i=>i.Project)
             .Where(i => i.ProjectId == projectId)
             .ToListAsync();
     }
@@ -58,7 +59,7 @@ public class IssueService : IIssueService
     }
 
     //  Delete Issue
-    public async Task DeleteIssue(int issueId, int userId)
+    public async Task DeleteIssue(long issueId, long userId)
     {
         var issue = await GetIssueById(issueId);
 
@@ -67,7 +68,7 @@ public class IssueService : IIssueService
     }
 
     //  Assign User to Issue
-    public async Task<Issue> AddUserToIssue(int issueId, int userId)
+    public async Task<Issue> AddUserToIssue(long issueId, long userId)
     {
         var issue = await _context.Issues
             .FirstOrDefaultAsync(i => i.Id == issueId);
@@ -88,7 +89,7 @@ public class IssueService : IIssueService
     }
 
     // Update Status
-    public async Task<Issue> UpdateStatus(int issueId, string status)
+    public async Task<Issue> UpdateStatus(long issueId, string status)
     {
         var issue = await GetIssueById(issueId);
 

@@ -1,6 +1,6 @@
 public interface IUserService
 {
-   // Task<User> FindUserProfileByJwt(string jwt);
+    Task<User> FindUserProfileByJwt(string jwt);
     Task<User> FindUserByEmail(string email);
     Task<User> FindUserById(long userId);
     Task<User> UpdateUsersProjectSize(User user, int number);

@@ -29,7 +29,10 @@ builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<IProjectService,ProjectService>();
 builder.Services.AddScoped<IInvitationService,InvitationService>();
-
+builder.Services.AddScoped<ICommentService,CommentService>();
+builder.Services.AddScoped<IIssueService,IssueService>();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IMessageService, MessageService>();
 //email sender
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings")
@@ -49,6 +52,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
+    
     //conect management
     builder.Services.AddCors(options =>
 {
@@ -86,9 +90,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<MessageHub>("/hubs/message");
 
 app.Run();
