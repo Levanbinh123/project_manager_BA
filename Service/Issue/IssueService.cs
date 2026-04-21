@@ -28,6 +28,7 @@ public class IssueService : IIssueService
     {
         return await _context.Issues
         .Include(i=>i.Project)
+        .Include(i=>i.Assignee)
             .Where(i => i.ProjectId == projectId)
             .ToListAsync();
     }
@@ -35,21 +36,39 @@ public class IssueService : IIssueService
     // Create Issue
     public async Task<Issue> CreateIssue(IssueRequest request, User user)
     {
+        
+        
         var project = await _context.Projects
             .FirstOrDefaultAsync(p => p.Id == request.ProjectId);
+        if (project.Owner.Id != user.Id)
+        {
+            throw new Exception("Only leader can create task");
+        }
 
         if (project == null)
             throw new Exception("Project not found");
+               User? assignee = null;
+
+        //  nếu có truyền AssigneeId thì tìm user
+        if (request.AssigneeId.HasValue)
+        {
+            assignee = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == request.AssigneeId.Value);
+
+            if (assignee == null)
+                throw new Exception("Assignee not found");
+        }
 
         var issue = new Issue
         {
             Title = request.Title,
             Description = request.Description,
-            Status = request.Status,
-            Priority = request.Priority,
+            Status = request?.Status,
+            Priority = request?.Priority,
             DueDate = request.DueDate,
             ProjectId = request.ProjectId,
-            Project = project
+            Project = project,
+            Assignee=assignee
         };
 
         _context.Issues.Add(issue);
@@ -71,6 +90,7 @@ public class IssueService : IIssueService
     public async Task<Issue> AddUserToIssue(long issueId, long userId)
     {
         var issue = await _context.Issues
+        .Include(i=>i.Assignee)
             .FirstOrDefaultAsync(i => i.Id == issueId);
 
         if (issue == null)

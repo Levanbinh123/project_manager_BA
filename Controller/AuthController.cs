@@ -30,14 +30,12 @@ public class AuthController : ControllerBase
 
         if (existingUser != null)
             return BadRequest("Email already exists");
-
         user.Password = _passwordService.Hash(user.Password);
         user.Role = Role.ROLE_USER;
-
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var jwt = _jwtService.GenerateToken(user.Email,user.Role.ToString());
+        var jwt = _jwtService.GenerateToken(user.Id,user.Email,user.Role.ToString());
 
         return StatusCode(201, new AuthResponse(jwt,"Register success   "));
     }
@@ -50,7 +48,7 @@ public class AuthController : ControllerBase
         if (!_passwordService.Verify(request.Password, user.Password))
             return Unauthorized("Invalid password");
 
-        var jwt = _jwtService.GenerateToken(user.Email,user.Role.ToString());
+        var jwt = _jwtService.GenerateToken(user.Id,user.Email,user.Role.ToString());
 
       return Ok(new AuthResponse(jwt,"singupsucces"));
        

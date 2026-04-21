@@ -81,6 +81,7 @@ public class ProjectController  : ControllerBase
         await _invitationService.SendInvitation(req.Email, req.ProjectId);
         return Ok("User invited");
     }
+
     [HttpGet("accept_invitation")]
     public async Task<ActionResult<Invitation>> AcceptInvitation([FromQuery] string token)
     {
@@ -88,8 +89,10 @@ public class ProjectController  : ControllerBase
 
         var invitation = await _invitationService.AcceptInvitation(token, user.Id);
 
-        await _projectService.AddUserToProject(invitation.ProjectId, user.Id);
 
-        return StatusCode(202, invitation);
+
+          return Ok(new {
+    projectId = invitation.ProjectId
+                 });
     }
 }

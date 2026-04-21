@@ -17,22 +17,24 @@ public class MessageController : ControllerBase
 
     // 🔹 Send message (REST)
     [HttpPost("send")]
-    public async Task<ActionResult<SendMessageResponse>> SendMessages(
-        [FromBody] CreateMessageRequest req)
+    public async Task<ActionResult<MessageDTO>> SendMessages(
+        [FromBody] CreateMessageRequest req,
+    [FromHeader(Name = "Authorization")] string authorization)
     {
-        var user = await _userService.FindUserById(req.SenderId);
-        if (user == null) return BadRequest("User not found");
-
-        var message = await _messageService.SaveMessage(req.SenderId, req.ProjectId, req.Content);
-
-        var res = new SendMessageResponse
+        var user=await _userService.FindUserProfileByJwt(authorization);
+        var message=await _messageService.SaveMessage(
+            user.Id,
+            req.ProjectId,
+            req.Content
+        );
+        var dto=new MessageDTO
         {
-            Id = message.Id,
-            Content = message.Content,
-            CreatedAt = message.CreatedAt
+            Id=message.Id,
+            Content=message.Content,
+            CreatedAt=message.CreatedAt,
+            SenderId=message.SenderId
         };
-
-        return Ok(res);
+        return Ok(dto);
     }
 
     // 🔹 Get messages
@@ -40,6 +42,13 @@ public class MessageController : ControllerBase
     public async Task<ActionResult<List<Message>>> GetMessagesByProjectId(long projectId)
     {
         var messages = await _messageService.GetMessagesByProjectId(projectId);
-        return Ok(messages);
+        var dtos=messages.Select(m=>new MessageDTO
+        {
+            Id=m.Id,
+            Content=m.Content,
+            CreatedAt=m.CreatedAt,
+            SenderId=m.SenderId
+        }).ToList();
+        return Ok(dtos);
     }
 }

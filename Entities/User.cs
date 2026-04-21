@@ -15,9 +15,10 @@ public class User
 
     public Role Role { get; set; }
 
+
     public List<Issue> AssignedIssues { get; set; } = new();
 }
 public enum Role
 {
-      ROLE_USER,ROLE_ADMIN
+      ROLE_USER,ROLE_ADMIN,ROLE_LEADER,
 }

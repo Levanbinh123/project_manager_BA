@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace project_manager_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260414065846_FixCascadeDeleteProjectChat")]
+    partial class FixCascadeDeleteProjectChat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,12 +104,6 @@ namespace project_manager_api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("ExpiredAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<long>("ProjectId")
                         .HasColumnType("bigint");
 
@@ -115,8 +112,6 @@ namespace project_manager_api.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
 
                     b.ToTable("Invitations");
                 });
@@ -311,8 +306,7 @@ namespace project_manager_api.Migrations
                 {
                     b.HasOne("Project", "Project")
                         .WithOne("Chat")
-                        .HasForeignKey("Chat", "ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("Chat", "ProjectId");
 
                     b.Navigation("Project");
                 });
@@ -351,23 +345,11 @@ namespace project_manager_api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Invitation", b =>
-                {
-                    b.HasOne("Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("Issue", b =>
                 {
                     b.HasOne("User", "Assignee")
                         .WithMany("AssignedIssues")
-                        .HasForeignKey("AssigneeId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("AssigneeId");
 
                     b.HasOne("Project", "Project")
                         .WithMany("Issues")
@@ -390,8 +372,7 @@ namespace project_manager_api.Migrations
 
                     b.HasOne("User", "Sender")
                         .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("SenderId");
 
                     b.Navigation("Sender");
 

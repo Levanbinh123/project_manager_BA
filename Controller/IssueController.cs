@@ -55,7 +55,9 @@ public class IssueController : ControllerBase
             Priority = i.Priority,
             DueDate = i.DueDate,
             ProjectId = i.Project.Id,
-            ProjectName = i.Project.Name
+            ProjectName = i.Project.Name,
+            AssigneeId=i.Assignee?.Id,
+            AssigneeName=i.Assignee?.FullName
         }).ToList();
 
         return Ok(dtos);

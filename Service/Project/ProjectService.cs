@@ -40,31 +40,48 @@ public class ProjectService : IProjectService
     }
 
     // Lấy project theo team + lọc category/tag
-    public async Task<List<ProjectDTO>> GetProjectByTeam(User user, string category, string tag)
+    public async Task<List<ProjectDTO>> GetProjectByTeam(
+    User user,
+    string? category,
+    string? tag)
+{
+    var query = _context.Projects
+        .Include(p => p.Team)
+        .Include(p => p.Owner)
+        .Include(p => p.Chat)
+        .Where(p => p.Team.Contains(user) || p.Owner.Id == user.Id)
+        .AsQueryable();
+
+    if (!string.IsNullOrEmpty(category))
     {
-        var projects = await _context.Projects
-            .Include(p => p.Team)
-            .Where(p => p.Team.Contains(user) || p.Owner.Id == user.Id)
-            .ToListAsync();
-
-        if (!string.IsNullOrEmpty(category))
-            projects = projects.Where(p => p.Category == category).ToList();
-
-        if (!string.IsNullOrEmpty(tag))
-            projects = projects.Where(p => p.Tags != null && p.Tags.Contains(tag)).ToList();
-
-        return projects.Select(p => new ProjectDTO
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Description = p.Description,
-            Tags = p.Tags ?? new List<string>(),
-            Category = p.Category ?? "No Category",
-            Owner = p.Owner,
-            Team = p.Team,
-            Chat = p.Chat
-        }).ToList();
+        query = query.Where(p =>
+            p.Category != null &&
+            p.Category.ToLower() == category.ToLower());
     }
+    var projects = await query.ToListAsync();
+
+     if (!string.IsNullOrWhiteSpace(tag))
+    {
+        projects = projects
+            .Where(p => p.Tags != null &&
+                        p.Tags.Any(t => t.ToLower() == tag.ToLower()))
+            .ToList();
+    }
+
+    
+
+    return projects.Select(p => new ProjectDTO
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Description = p.Description,
+        Tags = p.Tags ?? new List<string>(),
+        Category = p.Category ?? "",
+        Owner = p.Owner,
+        Team = p.Team,
+        Chat = p.Chat
+    }).ToList();
+}
 
     // Lấy project theo Id
     public async Task<ProjectDTO> GetProjectById(long id)
@@ -176,7 +193,10 @@ public class ProjectService : IProjectService
     {
         var projects = await _context.Projects
             .Include(p => p.Team)
-            .Where(p => p.Team.Contains(user) && p.Name.Contains(keyword))
+           .Where(p =>
+    (p.Team.Any(u => u.Id == user.Id) || p.Owner.Id == user.Id)
+    && p.Name.ToLower().Contains(keyword.ToLower())
+)
             .ToListAsync();
 
         return projects.Select(p => new ProjectDTO

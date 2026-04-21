@@ -16,23 +16,40 @@ public class InvitationService : IInvitationService
     // Gửi invitation
     public async Task SendInvitation(string email, long projectId)
     {
-        // Tạo token
+       try
+    {
         string token = Guid.NewGuid().ToString();
 
         var invitation = new Invitation
         {
             Email = email,
             ProjectId = projectId,
-            Token = token
+            Token = token,
+            ExpiredAt = DateTime.Now.AddHours(24),
+            IsUsed = false
         };
 
         _context.Invitations.Add(invitation);
         await _context.SaveChangesAsync();
 
-        // Link frontend
-        string link = $"https://project-managerment-react12.vercel.app/accept_invitation?token={token}";
+        string message = $@"
+<h3>Bạn được mời vào project</h3>
+<p>Token của bạn:</p>
+<h2>{token}</h2>
+<p>Hãy copy token này vào ứng dụng để tham gia.</p>
+";
 
-        await _emailService.SendEmailWithToken(email, link);
+await _emailService.SendEmail(
+    email,
+    "Project Invitation",
+    message
+);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("ERROR INVITE: " + ex.Message);
+        throw;
+    }
     }
 
     // Accept invitation
@@ -43,7 +60,10 @@ public class InvitationService : IInvitationService
 
         if (invitation == null)
             throw new Exception("Invitation not found!");
-
+        if(invitation.ExpiredAt<DateTime.Now)
+        throw new Exception("Invitation expired");
+        if(invitation.IsUsed)
+        throw new Exception("Invitation already used!");
         var user = await _context.Users.FindAsync(userId);
         if (user == null)
             throw new Exception("User not found!");
@@ -58,14 +78,13 @@ public class InvitationService : IInvitationService
 
         if (project == null)
             throw new Exception("Project not found!");
+            if(project.Team.Any(u=>u.Id==user.Id))
+            throw new Exception("User already in project");
 
         // Add user vào team
         project.Team.Add(user);
-
-        await _context.SaveChangesAsync();
-
-        // Xóa token
-        _context.Invitations.Remove(invitation);
+        invitation.IsUsed=true;
+    
         await _context.SaveChangesAsync();
 
         return invitation;

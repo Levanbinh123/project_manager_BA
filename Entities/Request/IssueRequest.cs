@@ -3,7 +3,8 @@ public class IssueRequest
     public int ProjectId { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
-    public string Status { get; set; }
-    public string Priority { get; set; }
-    public DateTime? DueDate { get; set; }
+    public string? Status { get; set; }="OPEN";
+    public string? Priority { get; set; }
+    public DateTime DueDate { get; set; }
+    public long? AssigneeId { get; set; } 
 }
